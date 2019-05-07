@@ -1,0 +1,53 @@
+name:                elevator
+version:             0.1.0.0
+github:              "martinring/elevator"
+license:             BSD3
+author:              "Martin Ring"
+maintainer:          "martin.ring@dfki.de"
+copyright:           "2019 Martin Ring"
+
+extra-source-files:
+- README.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/martinring/elevator#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- text
+- aeson
+- wai-app-static
+- warp
+- websockets
+- wai-websockets
+
+library:
+  source-dirs: src
+
+executables:
+  elevator-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - elevator
+
+tests:
+  elevator-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - elevator

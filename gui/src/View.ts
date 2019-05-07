@@ -1,0 +1,3 @@
+interface View {
+  elem: SVGElement
+}
