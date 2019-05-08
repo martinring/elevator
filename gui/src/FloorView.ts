@@ -55,17 +55,12 @@ class FloorView implements View {
     separator.classList.add('floor-separator')
     let wall = document.createElementNS('http://www.w3.org/2000/svg','path')
     wall.classList.add('wall')
-    wall.pathSegList.initialize(wall.createSVGPathSegMovetoAbs(0,0))
-    wall.pathSegList.appendItem(wall.createSVGPathSegLinetoHorizontalRel(options.textWidth + options.elevatorGap))    
+    let d = `M 0 0h${options.textWidth + options.elevatorGap}`
     for (let e = 0; e < model.building.shafts.length; e++) {         
-      wall.pathSegList.appendItem(wall.createSVGPathSegLinetoVerticalRel(-options.elevatorHeight))    
-      wall.pathSegList.appendItem(wall.createSVGPathSegLinetoHorizontalRel(options.elevatorWidth))        
-      wall.pathSegList.appendItem(wall.createSVGPathSegLinetoVerticalRel(options.elevatorHeight))            
-      wall.pathSegList.appendItem(wall.createSVGPathSegLinetoHorizontalRel(options.elevatorGap))   
+      d += `v${-options.elevatorHeight}h${options.elevatorWidth}v${options.elevatorHeight}h${options.elevatorGap}`
     }
-    wall.pathSegList.appendItem(wall.createSVGPathSegLinetoVerticalRel(-options.floorHeight))
-    wall.pathSegList.appendItem(wall.createSVGPathSegLinetoHorizontalRel(-floorWidth))
-    wall.pathSegList.appendItem(wall.createSVGPathSegClosePath())
+    d += `v${-options.floorHeight}h${-floorWidth}z`    
+    wall.setAttribute("d",d)    
     this.group.appendChild(wall)
     this.group.appendChild(separator)
     separator.x1.baseVal.value = 0
@@ -79,18 +74,16 @@ class FloorView implements View {
     pos.setTranslate((options.textWidth + options.elevatorGap) / 3,- options.elevatorHeight / 2)
     label.transform.baseVal.initialize(pos)    
     this.group.appendChild(label)
-    let up = document.createElementNS('http://www.w3.org/2000/svg','path')  
-    up.pathSegList.initialize(up.createSVGPathSegMovetoAbs((options.textWidth + options.elevatorGap) / 3,- 3.3 * options.elevatorHeight / 4))
-    up.pathSegList.appendItem(up.createSVGPathSegLinetoRel(-10,10))
-    up.pathSegList.appendItem(up.createSVGPathSegLinetoHorizontalRel(20))
-    up.pathSegList.appendItem(up.createSVGPathSegClosePath())
+    let up = document.createElementNS('http://www.w3.org/2000/svg','path') 
+    let upd = `M${(options.textWidth + options.elevatorGap) / 3} ${- 3.3 * options.elevatorHeight / 4}`   
+    upd += `l-10 10h20z`
+    up.setAttribute('d',upd)
     up.classList.add('button', 'up')
     this.group.appendChild(up)   
     let down = document.createElementNS('http://www.w3.org/2000/svg','path')  
-    down.pathSegList.initialize(down.createSVGPathSegMovetoAbs((options.textWidth + options.elevatorGap) / 3,- options.elevatorHeight / 4))
-    down.pathSegList.appendItem(down.createSVGPathSegLinetoRel(-10,-10))
-    down.pathSegList.appendItem(down.createSVGPathSegLinetoHorizontalRel(20))
-    down.pathSegList.appendItem(down.createSVGPathSegClosePath())
+    let downd = `M${(options.textWidth + options.elevatorGap) / 3} ${- options.elevatorHeight / 4}`
+    downd += `l-10 -10h20z`
+    down.setAttribute('d',downd)
     down.classList.add('button', 'down')
     this.group.appendChild(down)    
 

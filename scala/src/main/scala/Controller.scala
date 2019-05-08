@@ -25,8 +25,10 @@ class Controller extends Actor with ActorLogging {
     case Event.FloorPassed(shaft) =>
     case Event.ElevatorStopped(shaft) =>
     case Event.ElevatorDoorOpened(shaft) =>
+      log.info(s"elevator door $shaft opened")      
     case Event.ElevatorDoorClosed(shaft) =>
     case Event.FloorDoorOpened(floor, shaft) =>
+      log.info(s"floor door $shaft on floor $floor opened")      
     case Event.FloorDoorClosed(floor, shaft) =>
     case Event.ElevatorButtonPressed(shaft, floor) =>
       client ! Command.SetElevatorButtonLight(shaft,floor,true)
