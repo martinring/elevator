@@ -1,18 +1,22 @@
+import java.io.File
+
 import akka.actor._
 import akka.http.scaladsl._
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.ws.{ Message => WSMessage, TextMessage }
+import akka.http.scaladsl.model.ws.{TextMessage, UpgradeToWebSocket, Message => WSMessage}
 import akka.http.scaladsl.server.Directives._
 import akka.stream._
 import akka.util.Timeout
 import akka.pattern.ask
 import akka.stream.scaladsl._
+
 import scala.io.StdIn
 import scala.concurrent.duration._
 import scala.concurrent.Future
 import io.circe.parser._
 import io.circe.syntax._
 import Codec._
+import akka.http.scaladsl.server.directives.ContentTypeResolver
 
 object Main extends App {
 
@@ -42,12 +46,29 @@ object Main extends App {
       .idleTimeout(30 seconds)
   }
 
+  val requestHandler: HttpRequest => HttpResponse = {
+    case req @ HttpRequest(HttpMethods.GET, Uri.Path(path), _, _, _) =>
+      req.header[UpgradeToWebSocket] match {
+        case Some(upgrade) => upgrade.handleMessages(socket)
+        case None          =>
+          val file = new File(path)
+          if (file.exists())
+            HttpResponse(entity = scala.io.Source.fromFile(file).mkString)
+          else HttpResponse(404, entity = "Not found!")
+      }
+    case r: HttpRequest =>
+      r.discardEntityBytes() // important to drain incoming HTTP Entity stream
+      HttpResponse(404, entity = "Unknown resource!")
+  }
+
   val route =
     extractUpgradeToWebSocket { _ =>
       handleWebSocketMessages(socket)
     } ~
-      getFromDirectory("../gui") ~
-      getFromResource("../gui/elevator.svg")
+    getFromDirectory("../gui") ~
+    pathSingleSlash {
+      getFromFile("../gui/elevator.svg")
+    }
 
   val binding = Http().bindAndHandle(route,"localhost",3000)
 
