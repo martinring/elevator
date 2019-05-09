@@ -8,7 +8,8 @@ class Person {
   constructor(private building: Building, public elem: SVGGraphicsElement, private speedFactor: number) {
     this.position_ = building.floors[0]
     this.index_ = this.position_.enter(this)
-    this.act(0)
+    this.elem.style.fill = "#fff"
+    this.act(2000)
     this.id_ = Person.idCounter++;    
   }
 
@@ -30,7 +31,7 @@ class Person {
     return this.index_
   }
 
-  public act(delay: number) {
+  public act(delay: number) {    
     window.setTimeout(() => {      
       if (!this.destination) {
         this.waitingSince = Date.now()
@@ -62,7 +63,7 @@ class Person {
           if (!this.position.lightState(dir)) 
             this.position.pressButton(dir)
         }
-        this.act(500)
+        this.act(2000)
       } else {        
         let r = Math.min(255,512 * this.waitTime)
         let g = Math.min(255,512 - 512 * this.waitTime)
@@ -75,9 +76,9 @@ class Person {
           this.index_ = this.position_.enter(this)
           this.destination = null
           this.elem.style.fill = "#fff"
-        }
-        this.act(500)
+          this.act(60000)
+        } else this.act(1000)
       } 
-    }, (delay + Math.random() * 500) / this.speedFactor)
+    }, (delay * (Math.random() + 0.5)) / this.speedFactor)
   }
 }

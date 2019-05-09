@@ -9,7 +9,7 @@ class Controller extends Actor with ActorLogging {
   }
 
   def waitingForInitialization(client: ActorRef): Receive = {
-    case Event.Initialize(floors, shafts, capacity) =>
+    case Event.Initialize(floors, shafts, capacity, speed) =>
       log.info(s"initialized building with $floors floors, $shafts shafts and elevator capacity $capacity")
       context.become(running(client,floors,shafts,capacity))
       for (i <- 0 until shafts) {

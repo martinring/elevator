@@ -8,7 +8,7 @@ object Direction {
 
 sealed trait Event
 object Event {
-  case class Initialize(floors: Int, shafts: Int, capacity: Int) extends Event
+  case class Initialize(floors: Int, shafts: Int, capacity: Int, speed: Double) extends Event
   case class ElevatorBroken(shaft: Int, reason: String) extends Event
   case class ElevatorDoorBroken(shaft: Int, reason: String) extends Event
   case class FloorDoorBroken(floor: Int, shaft: Int, reason: String) extends Event

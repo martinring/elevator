@@ -9,7 +9,7 @@ type Send = Command -> IO ()
 
 control :: Send -> Event -> IO ()
 control send msg = case msg of
-  Initialize floors shafts capacity -> do
+  Initialize floors shafts capacity speed -> do
     putStrLn $
       "initialized building with " <> show floors <>
       " floors, " <> show shafts <> " shafts and elevator capacity " <>

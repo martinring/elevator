@@ -659,8 +659,8 @@ function init() {
         return elem;
     })();
     var params = new URLSearchParams(window.location.search);
-    var n = Number.parseInt(params.get('shafts') || '4') || 4; // number of elevators
-    var floors = Number.parseInt(params.get('floors') || '9') || 9;
+    var n = Number.parseInt(params.get('shafts') || '5') || 5; // number of elevators
+    var floors = Number.parseInt(params.get('floors') || '6') || 6;
     var speed = Number.parseFloat(params.get('speed') || '1.0') || 1.0;
     var capacity = Number.parseInt(params.get('capacity') || '12') || 12;
     var socket = new WebSocket("ws://" + location.host);
@@ -702,7 +702,7 @@ function init() {
         elem.r.baseVal.value = 4;
         elem.classList.add('person');
         var p = new Person(building, elem, speed);
-        if (i >= 250)
+        if (i >= 228)
             window.clearInterval(interval);
         i++;
     }, 250 / speed);
@@ -861,12 +861,14 @@ function init() {
             "tag": "Initialize",
             "floors": floors,
             "shafts": n,
-            "capacity": capacity
+            "capacity": capacity,
+            "speed": speed
         });
     });
     socket.addEventListener('message', function (e) {
-        if (e.data != "pong") {
+        if (e.data != "ping") {
             var msg = JSON.parse(e.data);
+            console.log("received message", msg);
             if (msg["shaft"] && (msg["shaft"] < 0 || msg["shaft"] >= building.shaftCount))
                 console.error("shaft " + msg["shaft"] + " does not exist", msg);
             else if (msg["floor"] && (msg["floor"] < 0 || msg["floor"] >= building.floorCount))
@@ -903,10 +905,13 @@ function init() {
                         building.floors[msg["floor"]].setLight(msg["direction"] == "Up" ? Direction.Up : Direction.Down, msg["on"]);
                         break;
                     default:
+                        console.warn("received unrecognised message", msg);
                         break;
                 }
             }
         }
+        else
+            socket.send("pong");
     });
 }
 document.addEventListener("DOMContentLoaded", init, {
@@ -920,7 +925,8 @@ var Person = /** @class */ (function () {
         this.waitingSince = 0;
         this.position_ = building.floors[0];
         this.index_ = this.position_.enter(this);
-        this.act(0);
+        this.elem.style.fill = "#fff";
+        this.act(2000);
         this.id_ = Person.idCounter++;
     }
     Object.defineProperty(Person.prototype, "id", {
@@ -986,7 +992,7 @@ var Person = /** @class */ (function () {
                     if (!_this.position.lightState(dir))
                         _this.position.pressButton(dir);
                 }
-                _this.act(500);
+                _this.act(2000);
             }
             else {
                 var r = Math.min(255, 512 * _this.waitTime);
@@ -1000,10 +1006,12 @@ var Person = /** @class */ (function () {
                     _this.index_ = _this.position_.enter(_this);
                     _this.destination = null;
                     _this.elem.style.fill = "#fff";
+                    _this.act(60000);
                 }
-                _this.act(500);
+                else
+                    _this.act(1000);
             }
-        }, (delay + Math.random() * 500) / this.speedFactor);
+        }, (delay * (Math.random() + 0.5)) / this.speedFactor);
     };
     Person.idCounter = 0;
     return Person;

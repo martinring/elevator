@@ -36,7 +36,7 @@ import GHC.Generics
 
 data Direction = Up | Down deriving (Generic, Show)
 
-data Event = Initialize { floors :: Int, shafts :: Int, capacity :: Int }
+data Event = Initialize { floors :: Int, shafts :: Int, capacity :: Int, speed :: Double }
            | ElevatorBroken { shaft :: Int, reason :: String }
            | ElevatorDoorBroken { shaft :: Int, reason :: String }
            | FloorDoorBroken { floor :: Int, shaft :: Int, reason :: String }

@@ -7,8 +7,8 @@ function init() {
     return elem
   })()
   const params = new URLSearchParams(window.location.search)
-  let n = Number.parseInt(params.get('shafts') || '4') || 4// number of elevators
-  let floors = Number.parseInt(params.get('floors') || '9') || 9
+  let n = Number.parseInt(params.get('shafts') || '5') || 5// number of elevators
+  let floors = Number.parseInt(params.get('floors') || '6') || 6
   let speed = Number.parseFloat(params.get('speed') || '1.0') || 1.0
   let capacity = Number.parseInt(params.get('capacity') || '12') || 12
   let socket = new WebSocket("ws://" + location.host)
@@ -50,7 +50,7 @@ function init() {
     elem.r.baseVal.value = 4
     elem.classList.add('person')
     let p = new Person(building,elem,speed)
-    if (i >= 250) window.clearInterval(interval)
+    if (i >= 228) window.clearInterval(interval)
     i++    
   },250 / speed)  
   /*for (let p = 0; p < 100; p++) {
@@ -162,7 +162,7 @@ function init() {
           send({
             tag: "FloorDoorOpened",
             floor: floor.id,
-            shaft: j            
+            shaft: j
           })
         },        
         closed() {
@@ -207,12 +207,14 @@ function init() {
       "tag": "Initialize",
       "floors": floors,
       "shafts": n,
-      "capacity": capacity
+      "capacity": capacity,
+      "speed": speed
     })
   })  
   socket.addEventListener('message',e => {
-    if (e.data != "pong") {
+    if (e.data != "ping") {
       let msg = JSON.parse(e.data)
+      console.log("received message", msg)
       if (msg["shaft"] && (msg["shaft"] < 0 || msg["shaft"] >= building.shaftCount))
         console.error(`shaft ${msg["shaft"]} does not exist`, msg)
       else if (msg["floor"] && (msg["floor"] < 0 || msg["floor"] >= building.floorCount))
@@ -249,10 +251,11 @@ function init() {
             building.floors[msg["floor"]].setLight(msg["direction"] == "Up" ? Direction.Up : Direction.Down, msg["on"])
             break;
           default:
+            console.warn("received unrecognised message", msg)
             break;
         }
       }
-    }      
+    } else socket.send("pong")    
   })
 }
 
