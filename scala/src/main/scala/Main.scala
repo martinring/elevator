@@ -37,7 +37,7 @@ object Main extends App {
       .collect { case Some(msg) => msg }
       .to(spreadSheetSink)
 
-    val out = Source.actorRef[Command](1, OverflowStrategy.fail)
+    val out = Source.actorRef[Command](32, OverflowStrategy.fail)
       .mapMaterializedValue(spreadSheet ! _)
 
     Flow.fromSinkAndSource(in,out)
